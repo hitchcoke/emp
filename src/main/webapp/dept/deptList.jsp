@@ -77,9 +77,8 @@ while(rs.next()){
 			<thead class="mt-4 p-5 bg-primary text-white rounded" >
 				<tr>
 					<th>부서번호</th>
-					<th>부서이름</th>
-					<th>수정</th>
-					<th>삭제</th>
+					<th colspan="3">부서이름</th>
+					
 				</tr>	
 			</thead>
 			<tbody>
@@ -88,19 +87,17 @@ while(rs.next()){
 				%>		
 					<tr>
 						<td>
-							<%=
-							d.deptNo
-							%>
+							<%=d.deptNo%>
 						</td>
 						
 						<td><%=d.deptName%></td>
 						<td>
-							<a href="<%=request.getContextPath()%>/updateDepartmentForm.jsp?pno=<%=d.deptNo%>" class="btn btn-outline-primary">
+							<a href="<%=request.getContextPath()%>/dept/updateDeptForm.jsp?deptNo=<%=d.deptNo%>" class="btn btn-outline-primary">
 							수정
 							</a>
 						</td>								
 						<td>
-							<a href="<%=request.getContextPath()%>/deleteDepartment.jsp?pno=<%=d.deptNo%>" class="btn btn-outline-primary">
+							<a href="<%=request.getContextPath()%>/dept/deleteDept.jsp?deptNo=<%=d.deptNo %>" class="btn btn-outline-primary">
 							삭제
 							</a>
 						</td>
