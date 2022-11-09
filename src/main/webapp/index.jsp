@@ -38,7 +38,8 @@
 	<h1 style="text-align:center" class="mt-4 p-5 bg-primary text-white rounded">부서추가</h1>
 	<br><br>
 	<h4>
-		<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg"><a href="<%=request.getContextPath()%>/dept/deptList.jsp">부서관리</a></button>
+		<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/dept/deptList.jsp;'">부서관리</button>
+		<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/dept/insertDeptForm.jsp;'">부서추가</button>
 	</h4>
 	
 </body>

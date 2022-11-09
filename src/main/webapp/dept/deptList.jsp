@@ -12,7 +12,7 @@ Connection conn = DriverManager.getConnection("jdbc:mariadb://127.0.0.1:3306/emp
 /* PreparedStatement stmt = conn.prepareStatement
 ("select dept_no, dept_name from departments"); */
 
-String sql = "SELECT dept_no deptNo, dept_name deptName FROM departments ORDER BY dept_no ASC";
+String sql = "SELECT dept_no deptNo, dept_name deptName FROM departments ORDER BY dept_no ASC"; //order by ...asc 로 내림차순으로 변경
 PreparedStatement stmt = conn.prepareStatement(sql);//Department class 와 name 동일화
 
 ResultSet rs = stmt.executeQuery();//배열 형태가아닌 db형태 java화 되있지 않다
@@ -20,7 +20,7 @@ ResultSet rs = stmt.executeQuery();//배열 형태가아닌 db형태 java화 되
 //3.출력(view) 나중되면 3개를 분리해서 작동시킨다(MVC)
 
 ArrayList<Department> dept = new ArrayList<Department>();
-
+//db형태를 배열화 한다
 while(rs.next()){
 	
 	Department d = new Department();
@@ -68,20 +68,19 @@ while(rs.next()){
 </head>
 <body>
 	<br>
-	<br>
+	<div>
+		<jsp:include page="../menu.jsp"></jsp:include> 
+		<!-- include의 주소에는 context를 사용하지 않는다 편한 액션 중하나 -->
+	</div>
 	<h1 style="text-align:center" class="mt-4 p-5 bg-primary text-white rounded">부서관리</h1>
 	
 	<div class=".container-fluid"></div>
 	<div>
-		<table class="table table-bordered align-middle">
-			<thead class="mt-4 p-5 bg-primary text-white rounded" >
-				<tr>
+		<table class="table table-bordered align-middle">		
+				<tr class="mt-4 p-5 bg-primary text-white rounded">
 					<th>부서번호</th>
 					<th colspan="3">부서이름</th>
-					
 				</tr>	
-			</thead>
-			<tbody>
 				<%
 					for(Department d : dept ){
 				%>		
@@ -97,7 +96,7 @@ while(rs.next()){
 							</a>
 						</td>								
 						<td>
-							<a href="<%=request.getContextPath()%>/dept/deleteDept.jsp?deptNo=<%=d.deptNo %>" class="btn btn-outline-primary">
+							<a href="<%=request.getContextPath()%>/dept/deleteDept.jsp?deptNo=<%=d.deptNo%>" class="btn btn-outline-primary">
 							삭제
 							</a>
 						</td>
@@ -105,12 +104,8 @@ while(rs.next()){
 				<%
 					}
 				%>	
-			</tbody>
 		 </table>
 	</div>	 
-	<div>
-		<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg"><a href="<%=request.getContextPath()%>/dept/insertDeptForm.jsp">부서추가</a></button>
-	</div>>
 	
 </body>
 </html>
