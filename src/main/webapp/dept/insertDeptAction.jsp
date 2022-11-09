@@ -18,12 +18,13 @@
    Class.forName("org.mariadb.jdbc.Driver");
    Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/employees","root","java1234");
    // 2-1 dept_no 중복검사
-   String sql1 = "SELECT dept_no FROM departments WHERE dept_no = ?"; // 입력하기전에 같은 dept_no가 존재하는지..
+   String sql1 = "SELECT * FROM departments WHERE dept_no = ? OR dept_name= ?"; // 입력하기전에 같은 dept_no가 존재하는지..
    PreparedStatement stmt1 = conn.prepareStatement(sql1);
    stmt1.setString(1, deptNo);
+   stmt1.setString(1, deptName);
    ResultSet rs = stmt1.executeQuery();
    if(rs.next()) { // 결과물있다 -> 같은 dept_no가 이미 존재한다.
-      String msg = URLEncoder.encode(deptNo+"는 사용할 수 없습니다", "utf-8");
+      String msg = URLEncoder.encode("부서번호나 부서이름이 중복되있습니다", "utf-8");
       response.sendRedirect(request.getContextPath()+"/dept/insertDeptForm.jsp?msg="+msg);
       return;
    }
