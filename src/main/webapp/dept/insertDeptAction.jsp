@@ -21,7 +21,7 @@
    String sql1 = "SELECT * FROM departments WHERE dept_no = ? OR dept_name= ?"; // 입력하기전에 같은 dept_no가 존재하는지..
    PreparedStatement stmt1 = conn.prepareStatement(sql1);
    stmt1.setString(1, deptNo);
-   stmt1.setString(1, deptName);
+   stmt1.setString(2, deptName);
    ResultSet rs = stmt1.executeQuery();
    if(rs.next()) { // 결과물있다 -> 같은 dept_no가 이미 존재한다.
       String msg = URLEncoder.encode("부서번호나 부서이름이 중복되있습니다", "utf-8");
