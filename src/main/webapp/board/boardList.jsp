@@ -7,6 +7,9 @@
 	request.setCharacterEncoding("utf-8");
 	
 	String word=request.getParameter("word");
+	String type=request.getParameter("type");
+	
+	System.out.println(word);
 	
 	int currentPage=1;
 	int lastPage=0;
@@ -24,7 +27,7 @@
 		PreparedStatement stmt2=null;
 		ResultSet rs1=null;
 		
-		if(word==null || word.equals("")){	
+		if( word==null || word.equals("")){	
 			sql1 = "SELECT COUNT(*) FROM board";
 			stmt1 = conn.prepareStatement(sql1);
 			rs1 = stmt1.executeQuery();
@@ -33,13 +36,15 @@
 			stmt2 = conn.prepareStatement(sql2);
 			
 		}else{
-			sql1 = "SELECT COUNT(*) FROM board WHERE board_content LIKE ?";
+			sql1 = "SELECT COUNT(*) FROM board WHERE "+type+" LIKE ?";
 			stmt1 = conn.prepareStatement(sql1);
+		
 			stmt1.setString(1, "%"+word+"%");
 			rs1 = stmt1.executeQuery();
 			
-			sql2 = "SELECT * FROM board WHERE board_content LIKE ? ORDER BY create_date DESC Limit "+ROW_PER_PAGE*(currentPage-1)+", "+ROW_PER_PAGE;
+			sql2 = "SELECT * FROM board WHERE "+type+" LIKE ? ORDER BY create_date DESC Limit "+ROW_PER_PAGE*(currentPage-1)+", "+ROW_PER_PAGE;
 			stmt2 = conn.prepareStatement(sql2);
+			
 			stmt2.setString(1, "%"+word+"%");
 			
 		} 
@@ -143,34 +148,65 @@
 		<div>
 		<nav aria-label="Page navigation example">
   			<ul class="pagination justify-content-center pagination-lg">
+  			<%if(word==null){ %>
    				
-   			<%if(currentPage > 1){%>	
-   				<li class="page-item">
-   				<% }else{ %>
-   				<li class="page-item disabled"><%} %>
-      				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>">Previous</a>
-    			</li>
-    		<%if(currentPage > 1){%>	
-    			<li class="page-item">
-    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>"><%=currentPage-1%></a></li>
-    		<%} %>
-    			<li class="page-item active" aria-current="page">
-    				<span class="page-link"><%=currentPage%></span></li>
-    		<%if(currentPage < lastPage){%>		
-    			<li class="page-item">
-    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>"><%=currentPage+1%></a></li>
-    		<%}
-    		  if(currentPage < lastPage){%>	
-    			<li class="page-item">
-    		<%}else{ %>
-    			<li class="page-item disabled"><%} %>
-      		   		<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>">Next</a>
-    			</li>
+	   			<%if(currentPage > 1){%>	
+	   				<li class="page-item">
+	   				<% }else{ %>
+	   				<li class="page-item disabled"><%} %>
+	      				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>">Previous</a>
+	    			</li>
+	    		<%if(currentPage > 1){%>	
+	    			<li class="page-item">
+	    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>"><%=currentPage-1%></a></li>
+	    		<%} %>
+	    			<li class="page-item active" aria-current="page">
+	    				<span class="page-link"><%=currentPage%></span></li>
+	    		<%if(currentPage < lastPage){%>		
+	    			<li class="page-item">
+	    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>"><%=currentPage+1%></a></li>
+	    		<%}
+	    		  if(currentPage < lastPage){%>	
+	    			<li class="page-item">
+	    		<%}else{ %>
+	    			<li class="page-item disabled"><%} %>
+	      		   		<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>">Next</a>
+	    			</li>
+	    	<%}else{ %>
+	    		<%if(currentPage > 1){%>	
+	   				<li class="page-item">
+	   				<% }else{ %>
+	   				<li class="page-item disabled"><%} %>
+	      				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>&type=<%=type%>">Previous</a>
+	    			</li>
+	    		<%if(currentPage > 1){%>	
+	    			<li class="page-item">
+	    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>&type=<%=type%>"><%=currentPage-1%></a></li>
+	    		<%} %>
+	    			<li class="page-item active" aria-current="page">
+	    				<span class="page-link"><%=currentPage%></span></li>
+	    		<%if(currentPage < lastPage){%>		
+	    			<li class="page-item">
+	    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>&type=<%=type%>"><%=currentPage+1%></a></li>
+	    		<%}
+	    		  if(currentPage < lastPage){%>	
+	    			<li class="page-item">
+	    		<%}else{ %>
+	    			<li class="page-item disabled"><%} %>
+	      		   		<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>&type=<%=type%>">Next</a>
+	    			</li>
+	    	<%} %>				
  	   		</ul>
 	   </nav></div>
 	<div>
 		<form method="post" action="<%=request.getContextPath()%>/board/boardList.jsp">
-			<span>&nbsp;&nbsp;&nbsp;</span><input type="text" name="word" placeholder="내용검색">
+			<span>&nbsp;&nbsp;&nbsp;</span>	
+			<select name="type">
+	    		<option value="board_title">제목</option>
+	   			<option value="board_content">내용</option>
+				<option value="board_write">작성자</option>
+			</select>
+			<span>&nbsp;&nbsp;&nbsp;</span><input type="text" name="word" placeholder="검색">
 			<button type="submit" class="btn btn-outline-primary">검색</button>
 		</form>
 		<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/board/insertBoardForm.jsp;'">글 쓰기</button>	
