@@ -37,7 +37,7 @@
 				
 		}else{
 			String msg = URLEncoder.encode("비밀번호가 틀렸습니다","utf-8"); // get방식 주소창에 문자열 인코딩
-		    response.sendRedirect(request.getContextPath()+"/board/updateBoardForm.jsp?msg="+msg+"&boardNo="+boardNo);
+		    response.sendRedirect(request.getContextPath()+"/board/updateBoardForm.jsp?msg="+msg+"&boardNo="+boardNo+"&boardWrite="+boardWrite);
 		    return;
 
 		}

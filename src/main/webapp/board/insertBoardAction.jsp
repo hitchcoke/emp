@@ -21,8 +21,7 @@
 	   }
 	   
    
-   // 2)
-   // 이미 존재하는 key(dept_no)값 동일한 값이 입력되면 예외(에러)가 발생한다. -> 동일한 dept_no값이 입력되었을때 예외가 발생하지 않도록...
+
    Class.forName("org.mariadb.jdbc.Driver");
    Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/employees","root","java1234");
    // 2-2 입력

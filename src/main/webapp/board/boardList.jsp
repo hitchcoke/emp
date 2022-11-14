@@ -4,53 +4,77 @@
 
 
 <%
-request.setCharacterEncoding("utf-8");
-
-int currentPage=1;
-int lastPage=0;
-final int ROW_PER_PAGE =10;
-if(request.getParameter("currentPage")!=null){
-	currentPage= Integer.parseInt(request.getParameter("currentPage"));
-}
-
-Class.forName("org.mariadb.jdbc.Driver");
-Connection conn = DriverManager.getConnection("jdbc:mariadb://127.0.0.1:3306/employees","root","java1234");
-
-String sql1 = "SELECT COUNT(*) FROM board";
-PreparedStatement stmt1 = conn.prepareStatement(sql1);
-ResultSet rs1 = stmt1.executeQuery();
-int count =0;
-if(rs1.next()){
-	count= rs1.getInt("COUNT(*)");
-}
-
-lastPage= count/ ROW_PER_PAGE;
-if(count % ROW_PER_PAGE !=0){
-	lastPage++;
-}//최대값 구하고 페이지 표시값 만치 나눈다 그 후 딱 나눠 떨어지지않으면 한페이지 더 준다
-
-String sql2 = "SELECT * FROM board ORDER BY board_no ASC Limit "+ROW_PER_PAGE*(currentPage-1)+", "+ROW_PER_PAGE;
-PreparedStatement stmt2 = conn.prepareStatement(sql2);//기본 paging 알고리즘 표시값 * (페이지값-1)
-
-ResultSet rs2 = stmt2.executeQuery();
-
-
-
-ArrayList<Board> board = new ArrayList<Board>();
-//db형태를 배열화 한다
-while(rs2.next()){
+	request.setCharacterEncoding("utf-8");
 	
-	Board b = new Board();
-	b.boardNo =rs2.getInt("board_no");
-	b.boardTitle =rs2.getString("board_title");
-	b.boardWrite =rs2.getString("board_write");
-	b.boardContent =rs2.getString("board_content");
-	b.creatDate=rs2.getString("create_date");
+	String word=request.getParameter("word");
 	
-	board.add(b);
-	
-}
+	int currentPage=1;
+	int lastPage=0;
+	final int ROW_PER_PAGE =10;
+	if(request.getParameter("currentPage")!=null){
+		currentPage= Integer.parseInt(request.getParameter("currentPage"));
+	}
 
+	Class.forName("org.mariadb.jdbc.Driver");
+	Connection conn = DriverManager.getConnection("jdbc:mariadb://127.0.0.1:3306/employees","root","java1234");
+	
+		String sql1=null;
+		PreparedStatement stmt1=null;
+		String sql2=null;
+		PreparedStatement stmt2=null;
+		ResultSet rs1=null;
+		
+		if(word==null || word.equals("")){	
+			sql1 = "SELECT COUNT(*) FROM board";
+			stmt1 = conn.prepareStatement(sql1);
+			rs1 = stmt1.executeQuery();
+			
+			sql2 = "SELECT * FROM board ORDER BY create_date DESC Limit "+ROW_PER_PAGE*(currentPage-1)+", "+ROW_PER_PAGE;
+			stmt2 = conn.prepareStatement(sql2);
+			
+		}else{
+			sql1 = "SELECT COUNT(*) FROM board WHERE board_content LIKE ?";
+			stmt1 = conn.prepareStatement(sql1);
+			stmt1.setString(1, "%"+word+"%");
+			rs1 = stmt1.executeQuery();
+			
+			sql2 = "SELECT * FROM board WHERE board_content LIKE ? ORDER BY create_date DESC Limit "+ROW_PER_PAGE*(currentPage-1)+", "+ROW_PER_PAGE;
+			stmt2 = conn.prepareStatement(sql2);
+			stmt2.setString(1, "%"+word+"%");
+			
+		} 
+
+		int count =0;
+		if(rs1.next()){
+			count= rs1.getInt("COUNT(*)");
+		}
+		
+		lastPage= count/ ROW_PER_PAGE;
+		if(count % ROW_PER_PAGE !=0){
+			lastPage++;
+		} 
+		
+		
+		
+		ResultSet rs2 = stmt2.executeQuery();
+		
+		
+		
+		ArrayList<Board> board = new ArrayList<Board>();
+		//db형태를 배열화 한다
+		while(rs2.next()){
+			
+			Board b = new Board();
+			b.boardNo =rs2.getInt("board_no");
+			b.boardTitle =rs2.getString("board_title");
+			b.boardWrite =rs2.getString("board_write");
+			b.boardContent =rs2.getString("board_content");
+			b.creatDate=rs2.getString("create_date");
+			
+			board.add(b);
+			
+		}
+	
 
 //db 테이블과 같은 클래스(vo,도메인)는 만들어야 한다
 
@@ -62,10 +86,7 @@ while(rs2.next()){
 <head>
 <meta charset="UTF-8">
 <title>boardList</title>
-<!-- Latest compiled and minified CSS -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
-	
-<!-- Latest compiled JavaScript -->
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
 	<style>
 		a:link {
@@ -119,32 +140,49 @@ while(rs2.next()){
 		 </table>
 	</div>
 	<br>
-		<h6>&nbsp;&nbsp;현재페이지: <%=currentPage%></h6>
-		<br>
 		<div>
-		<% 
-		if(currentPage < lastPage){
-		%>
-			<span>&nbsp;&nbsp;&nbsp;</span>
-			<button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>'">다음</button>
-		<%
-		}
-		%>
-		<%
-		if(currentPage >1){
-		%>	
-			<span>&nbsp;&nbsp;&nbsp;</span>
-			<button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>'">이전</button>
-			
-		<%
-		}%>
-		<span>&nbsp;&nbsp;&nbsp;</span>
-		<button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/board/boardList.jsp?currentPage=1'">처음으로</button>
-		<span>&nbsp;&nbsp;&nbsp;</span>
-		<button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=lastPage%>'">끝으로</button>
-		<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/board/insertBoardForm.jsp;'">글 쓰기</button>
+		<nav aria-label="Page navigation example">
+  			<ul class="pagination justify-content-center pagination-lg">
+   				
+   			<%if(currentPage > 1){%>	
+   				<li class="page-item">
+   				<% }else{ %>
+   				<li class="page-item disabled"><%} %>
+      				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>">Previous</a>
+    			</li>
+    		<%if(currentPage > 1){%>	
+    			<li class="page-item">
+    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>"><%=currentPage-1%></a></li>
+    		<%} %>
+    			<li class="page-item active" aria-current="page">
+    				<span class="page-link"><%=currentPage%></span></li>
+    		<%if(currentPage < lastPage){%>		
+    			<li class="page-item">
+    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>"><%=currentPage+1%></a></li>
+    		<%}
+    		  if(currentPage < lastPage){%>	
+    			<li class="page-item">
+    		<%}else{ %>
+    			<li class="page-item disabled"><%} %>
+      		   		<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>">Next</a>
+    			</li>
+ 	   		</ul>
+	   </nav></div>
+	<div>
+		<form method="post" action="<%=request.getContextPath()%>/board/boardList.jsp">
+			<span>&nbsp;&nbsp;&nbsp;</span><input type="text" name="word" placeholder="내용검색">
+			<button type="submit" class="btn btn-outline-primary">검색</button>
+		</form>
+		<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/board/insertBoardForm.jsp;'">글 쓰기</button>	
+	</div>	
 		
-		</div>		 
+		<%
+		if(request.getParameter("msg")!=null){
+		%>
+		<div class="alert alert-primary" role="alert"><%=request.getParameter("msg")%></div>
+		<% 			
+		}
+		%>	
 	
 </body>
 </html>

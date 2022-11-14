@@ -4,35 +4,62 @@
 
 
 <%
+	request.setCharacterEncoding("utf-8");
+
+	String word=request.getParameter("word");
+
+	int currentPage=1;
 	int lastPage=0;
-	int currentPage= 1;
-	int rowPerPage=10;
-	
-	if(request.getParameter("currentPage") != null) {
-		currentPage = Integer.parseInt(request.getParameter("currentPage"));
+	final int ROW_PER_PAGE =10;
+	if(request.getParameter("currentPage")!=null){
+		currentPage= Integer.parseInt(request.getParameter("currentPage"));
 	}
+	
 	Class.forName("org.mariadb.jdbc.Driver");
 	Connection conn = DriverManager.getConnection("jdbc:mariadb://127.0.0.1:3306/employees","root","java1234");
 	
-	String sql1 = "SELECT COUNT(*) FROM employees";
-	PreparedStatement stmt1 = conn.prepareStatement(sql1);
-	ResultSet rs1 = stmt1.executeQuery();
-	int count =0;
-	if(rs1.next()){
-		count= rs1.getInt("COUNT(*)");
-	}
+		String sql1=null;
+		PreparedStatement stmt1=null;
+		String sql2=null;
+		PreparedStatement stmt2=null;
+		ResultSet rs1=null;
+		
+		if(word==null || word.equals("")){	
+			sql1 = "SELECT COUNT(*) FROM employees";
+			stmt1 = conn.prepareStatement(sql1);
+			rs1 = stmt1.executeQuery();
+			
+			sql2 = "SELECT * FROM employees ORDER BY emp_no DESC Limit "+ROW_PER_PAGE*(currentPage-1)+", "+ROW_PER_PAGE;
+			stmt2 = conn.prepareStatement(sql2);
+			
+		}else{
+			sql1 = "SELECT COUNT(*) FROM employees WHERE first_name LIKE ? OR last_name Like ?";
+			stmt1 = conn.prepareStatement(sql1);
+			stmt1.setString(1, "%"+word+"%");
+			stmt1.setString(2, "%"+word+"%");
+			rs1 = stmt1.executeQuery();
+			
+			sql2 = "SELECT * FROM employees WHERE first_name LIKE ? OR last_name Like ? ORDER BY emp_no DESC Limit "+ROW_PER_PAGE*(currentPage-1)+", "+ROW_PER_PAGE;
+			stmt2 = conn.prepareStatement(sql2);
+			stmt2.setString(1, "%"+word+"%");
+			stmt2.setString(2, "%"+word+"%");
+			
+			
+		} 
 	
-	lastPage= count/ rowPerPage;
-	if(count % rowPerPage !=0){
-		lastPage++;
-	}//최대값 구하고 페이지 표시값 만치 나눈다 그 후 딱 나눠 떨어지지않으면 한페이지 더 준다
-	
-	String sql2 = "SELECT * FROM employees ORDER BY emp_no ASC Limit "+rowPerPage*(currentPage-1)+", "+rowPerPage;
-	PreparedStatement stmt2 = conn.prepareStatement(sql2);//기본 paging 알고리즘 표시값 * (페이지값-1)
-	
-	ResultSet rs2 = stmt2.executeQuery();
-	
-	
+		int count =0;
+		if(rs1.next()){
+			count= rs1.getInt("COUNT(*)");
+		}
+		
+		lastPage= count/ ROW_PER_PAGE;
+		if(count % ROW_PER_PAGE !=0){
+			lastPage++;
+		} 
+		
+		
+		
+		ResultSet rs2 = stmt2.executeQuery();
 
 	
 %>
@@ -56,7 +83,6 @@
 		<table class="table table-bordered align-middle">
 			<tr class="mt-4 p-5 bg-primary text-white rounded">
 				<th>생년월일</th>
-				<th>성</th>
 				<th>이름</th>
 				<th>성별</th>
 				<th colspan="3">입사일자</th>
@@ -66,8 +92,7 @@
 			%>
 				<tr>
 					<td><%=rs2.getString("birth_date")%></td>
-					<td><%=rs2.getString("first_name")%></td>
-					<td><%=rs2.getString("last_name")%></td>
+					<td><%=rs2.getString("first_name")%> <%=rs2.getString("last_name")%></td>
 					<td><%=rs2.getString("gender")%></td>
 					<td><%=rs2.getString("hire_date")%></td>
 					<td><a href="<%=request.getContextPath()%>/emp/updateEmpForm.jsp?empNo=<%=rs2.getInt("emp_no")%>" class="btn btn-outline-primary">수정</a></td>
@@ -77,29 +102,42 @@
 			}
 			%>	
 		</table>
-		<br>
-		<h6>&nbsp;&nbsp;현재페이지: <%=currentPage%></h6>
+		
 		<br>
 		<div>
-		<%
-		if(currentPage >1){
-		%>	
-			<span>&nbsp;&nbsp;&nbsp;</span>
-			<button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage-1%>'">이전</button>
-			
-		<%
-		}
-		if(currentPage < lastPage){
-		%>
-			<span>&nbsp;&nbsp;&nbsp;</span>
-			<button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage+1%>'">다음</button>
-		<%
-		}
-		%>
-		<span>&nbsp;&nbsp;&nbsp;</span>
-		<button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/emp/empList.jsp?currentPage=1'">처음으로</button>
-		<span>&nbsp;&nbsp;&nbsp;</span>
-		<button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=lastPage%>'">끝으로</button>
+			<nav aria-label="Page navigation example">
+  			<ul class="pagination justify-content-center pagination-lg">
+   				
+   			<%if(currentPage > 1){%>	
+   				<li class="page-item">
+   				<% }else{ %>
+   				<li class="page-item disabled"><%} %>
+      				<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>">Previous</a>
+    			</li>
+    		<%if(currentPage > 1){%>	
+    			<li class="page-item">
+    				<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>"><%=currentPage-1%></a></li>
+    		<%} %>
+    			<li class="page-item active" aria-current="page">
+    				<span class="page-link"><%=currentPage%></span></li>
+    		<%if(currentPage < lastPage){%>		
+    			<li class="page-item">
+    				<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>"><%=currentPage+1%></a></li>
+    		<%}
+    		  if(currentPage < lastPage){%>	
+    			<li class="page-item">
+    		<%}else{ %>
+    			<li class="page-item disabled"><%} %>
+      		   		<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>">Next</a>
+    			</li>
+ 	   		</ul>
+	   </nav>
 		</div>
+		<div>
+			<form method="post" action="<%=request.getContextPath()%>/emp/empList.jsp">
+				<span>&nbsp;&nbsp;&nbsp;</span><input type="text" name="word" placeholder="사원검색">
+				<button type="submit" class="btn btn-outline-primary">검색</button>
+			</form>
+		</div>	
 	</body>
 </html>

@@ -1,9 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %><%@ page import="vo.*"  %>
-<%@ page import="java.util.*" %>
+<%@ page import="java.util.*" %><%@page import="java.net.URLEncoder" %>
+
 
 
 <%
+
+request.setCharacterEncoding("utf-8");
+
+String word=request.getParameter("word");
+
 //1.요청분석(controller)
 //2.업무처리 (model)
 Class.forName("org.mariadb.jdbc.Driver");
@@ -11,9 +17,16 @@ Connection conn = DriverManager.getConnection("jdbc:mariadb://127.0.0.1:3306/emp
 
 /* PreparedStatement stmt = conn.prepareStatement
 ("select dept_no, dept_name from departments"); */
-
-String sql = "SELECT dept_no deptNo, dept_name deptName FROM departments ORDER BY dept_no ASC"; //order by ...asc 로 내림차순으로 변경
-PreparedStatement stmt = conn.prepareStatement(sql);//Department class 와 name 동일화
+String sql=null;
+PreparedStatement stmt=null;
+if(word==null){
+	sql = "SELECT dept_no, dept_name FROM departments ORDER BY dept_no ASC"; //order by ...asc 로 내림차순으로 변경
+	stmt = conn.prepareStatement(sql);//Department class 와 name 동일화
+}else{
+	sql="SELECT * FROM departments WHERE dept_name LIKE ? ORDER BY dept_no ASC";
+	stmt = conn.prepareStatement(sql);
+	stmt.setString(1, "%"+word+"%");
+}
 
 ResultSet rs = stmt.executeQuery();//배열 형태가아닌 db형태 java화 되있지 않다
 
@@ -24,8 +37,8 @@ ArrayList<Department> dept = new ArrayList<Department>();
 while(rs.next()){
 	
 	Department d = new Department();
-	d.deptNo=rs.getString("deptNo");
-	d.deptName= rs.getString("deptName");
+	d.deptNo=rs.getString("dept_no");
+	d.deptName= rs.getString("dept_name");
 	dept.add(d);
 	
 }
@@ -105,7 +118,25 @@ while(rs.next()){
 					}
 				%>	
 		 </table>
-	</div>	 
-	
+	</div>
+	<br> 
+	<form method="post" action="<%=request.getContextPath()%>/dept/deptList.jsp">
+		<label for="word">부서이름 검색</label>
+		<input type="text" id="word" name="word">
+		<button type="submit" class="btn btn-outline-primary">검색</button>
+	</form>
+	<br>
+	<%
+		if(request.getParameter("msg")!=null){
+	%>
+		<div class="alert alert-primary" role="alert"><%=request.getParameter("msg")%></div>
+	<% 			
+		}
+	%>
+	<br>
+	<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/dept/insertDeptForm.jsp;'">부서추가</button>	
 </body>
+<!-- post 와 get방식의 차이 get을 사용 했을때 노출된다 url의 사용되기 때문
+	post를 사용하는 이유는 묶어서 보내기때문에 url의 노출 되지 않는다 
+	get의 방식의 장점은 getparameter 값이 남기때문에 남겨야할때는 get을 사용하는 것이 좋다-->
 </html>

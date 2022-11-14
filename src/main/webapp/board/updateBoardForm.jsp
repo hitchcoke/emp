@@ -8,6 +8,8 @@ request.setCharacterEncoding("utf-8");
 
 
 int boardNo = Integer.parseInt(request.getParameter("boardNo"));
+String boardWrite= request.getParameter("boardWrite");
+
 System.out.print(boardNo);
 %>
 
@@ -50,7 +52,7 @@ System.out.print(boardNo);
 		<label for="exampleFormControlInput1" class="form-label">&nbsp;제목</label>
   			<input type="text" class="form-control" name="boardTitle"><!-- plaecholder로 들어갈 부서넘버의 예시를 알려준다 -->
   		<label for="exampleFormControlInput1" class="form-label">&nbsp;작성자</label>
-  			<input type="text" class="form-control" name="boardWrite">
+  			<input type="text" class="form-control" name="boardWrite" readonly="readonly" value="<%=boardWrite%>">
   		<label for="exampleFormControlInput1" class="form-label">&nbsp;비밀번호</label>
   			<input type="password" class="form-control" name="boardPw"><!-- plaecholder로 들어갈 부서넘버의 예시를 알려준다 -->
   		<label for="exampleFormControlInput1" >&nbsp;내용</label>
