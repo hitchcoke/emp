@@ -115,46 +115,46 @@
 	   				<li class="page-item">
 	   				<% }else{ %>
 	   				<li class="page-item disabled"><%} %>
-	      				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>">Previous</a>
+	      				<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage-1%>">Previous</a>
 	    			</li>
 	    		<%if(currentPage > 1){%>	
 	    			<li class="page-item">
-	    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>"><%=currentPage-1%></a></li>
+	    				<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage-1%>"><%=currentPage-1%></a></li>
 	    		<%} %>
 	    			<li class="page-item active" aria-current="page">
 	    				<span class="page-link"><%=currentPage%></span></li>
 	    		<%if(currentPage < lastPage){%>		
 	    			<li class="page-item">
-	    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>"><%=currentPage+1%></a></li>
+	    				<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage+1%>"><%=currentPage+1%></a></li>
 	    		<%}
 	    		  if(currentPage < lastPage){%>	
 	    			<li class="page-item">
 	    		<%}else{ %>
 	    			<li class="page-item disabled"><%} %>
-	      		   		<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>">Next</a>
+	      		   		<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage+1%>">Next</a>
 	    			</li>
 	    	<%}else{ %>
 	    		<%if(currentPage > 1){%>	
 	   				<li class="page-item">
 	   				<% }else{ %>
 	   				<li class="page-item disabled"><%} %>
-	      				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>">Previous</a>
+	      				<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>">Previous</a>
 	    			</li>
 	    		<%if(currentPage > 1){%>	
 	    			<li class="page-item">
-	    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>"><%=currentPage-1%></a></li>
+	    				<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>"><%=currentPage-1%></a></li>
 	    		<%} %>
 	    			<li class="page-item active" aria-current="page">
 	    				<span class="page-link"><%=currentPage%></span></li>
 	    		<%if(currentPage < lastPage){%>		
 	    			<li class="page-item">
-	    				<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>"><%=currentPage+1%></a></li>
+	    				<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>"><%=currentPage+1%></a></li>
 	    		<%}
 	    		  if(currentPage < lastPage){%>	
 	    			<li class="page-item">
 	    		<%}else{ %>
 	    			<li class="page-item disabled"><%} %>
-	      		   		<a class="page-link" href="<%=request.getContextPath()%>/board/boardList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>">Next</a>
+	      		   		<a class="page-link" href="<%=request.getContextPath()%>/emp/empList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>">Next</a>
 	    			</li>
 	    	<%} %>
  	   		</ul>
@@ -162,7 +162,7 @@
 		</div>
 		<div>
 			<form method="post" action="<%=request.getContextPath()%>/emp/empList.jsp">
-				<span>&nbsp;&nbsp;&nbsp;</span><input type="text" name="word" placeholder="사원검색">
+				<span>&nbsp;&nbsp;&nbsp;</span><input type="text" name="word" <%if(word==null||word.equals("")){ %>placeholder="사원검색"<%}else{ %>value="<%=word%>"<%}%>>
 				<button type="submit" class="btn btn-outline-primary">검색</button>
 			</form>
 		</div>	

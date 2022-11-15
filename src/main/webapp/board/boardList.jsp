@@ -9,7 +9,6 @@
 	String word=request.getParameter("word");
 	String type=request.getParameter("type");
 	
-	System.out.println(word);
 	
 	int currentPage=1;
 	int lastPage=0;
@@ -206,7 +205,7 @@
 	   			<option value="board_content">내용</option>
 				<option value="board_write">작성자</option>
 			</select>
-			<span>&nbsp;&nbsp;&nbsp;</span><input type="text" name="word" placeholder="검색">
+			<span>&nbsp;&nbsp;&nbsp;</span><input type="text" name="word" <%if(word==null||word.equals("")){ %>placeholder="검색"<%}else{ %>value="<%=word%>"<% }%>>
 			<button type="submit" class="btn btn-outline-primary">검색</button>
 		</form>
 		<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/board/insertBoardForm.jsp;'">글 쓰기</button>	

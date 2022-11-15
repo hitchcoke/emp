@@ -121,8 +121,8 @@ while(rs.next()){
 	</div>
 	<br> 
 	<form method="post" action="<%=request.getContextPath()%>/dept/deptList.jsp">
-		<label for="word">부서이름 검색</label>
-		<input type="text" id="word" name="word">
+		<span>&nbsp;</span>
+		<input type="text" id="word" name="word" placeholder="부서이름 검색"> 
 		<button type="submit" class="btn btn-outline-primary">검색</button>
 	</form>
 	<br>
@@ -133,8 +133,10 @@ while(rs.next()){
 	<% 			
 		}
 	%>
-	<br>
-	<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/dept/insertDeptForm.jsp;'">부서추가</button>	
+	<div>
+		<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/deptemp/deptEmpList.jsp;'">부서별 사원보기</button>	
+		<span>&nbsp;&nbsp;&nbsp;</span><button type="button" class="btn btn-outline-primary btn-lg" onclick="location.href='<%=request.getContextPath()%>/dept/insertDeptForm.jsp;'">부서추가</button>	
+	</div>
 </body>
 <!-- post 와 get방식의 차이 get을 사용 했을때 노출된다 url의 사용되기 때문
 	post를 사용하는 이유는 묶어서 보내기때문에 url의 노출 되지 않는다 

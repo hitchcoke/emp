@@ -4,6 +4,11 @@
 <%@ page import = "vo.*" %>
 <%@ page import = "java.util.*" %>
 <%
+	
+	request.setCharacterEncoding("utf-8");
+
+	String word=request.getParameter("word");
+
    // 1
    int currentPage = 1;
    if(request.getParameter("currentPage") != null) {
@@ -16,16 +21,41 @@
    int beginRow = ROW_PER_PAGE*(currentPage-1);
    Class.forName("org.mariadb.jdbc.Driver");
    Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/employees", "root", "java1234");
-
-   String sql = "SELECT s.emp_no empNo, s.salary salary, s.from_date fromDate, s.to_date toDate, e.first_name firstName, e.last_name lastName FROM salaries s INNER JOIN employees e ON s.emp_no = e.emp_no ORDER BY s.emp_no ASC LIMIT ?,?";
-   PreparedStatement stmt = conn.prepareStatement(sql);
-   stmt.setInt(1, beginRow);
-   stmt.setInt(2, ROW_PER_PAGE);
-   ResultSet rs = stmt.executeQuery();
+   String sql=null;
+   PreparedStatement stmt=null;
+   ResultSet rs=null;
+   String sql1=null;
+   PreparedStatement stmt1=null;
+   ResultSet rs1=null;
+		  
+  
    
-   String sql1 = "SELECT COUNT(*) FROM salaries s INNER JOIN employees e ON s.emp_no = e.emp_no";
-   PreparedStatement stmt1 = conn.prepareStatement(sql1);
-   ResultSet rs1 = stmt1.executeQuery();
+   if(word==null||word.equals("")){	
+	   sql = "SELECT s.emp_no empNo, s.salary salary, s.from_date fromDate, s.to_date toDate, e.first_name firstName, e.last_name lastName FROM salaries s INNER JOIN employees e ON s.emp_no = e.emp_no ORDER BY fromDate ASC LIMIT ?,?";
+	   stmt = conn.prepareStatement(sql);
+	   stmt.setInt(1, beginRow);
+	   stmt.setInt(2, ROW_PER_PAGE);
+	   rs = stmt.executeQuery();
+	   
+	   sql1 = "SELECT COUNT(*) FROM salaries s INNER JOIN employees e ON s.emp_no = e.emp_no";
+	   stmt1 = conn.prepareStatement(sql1);
+	   rs1 = stmt1.executeQuery();
+   }else{
+	   sql = "SELECT s.emp_no empNo, s.salary salary, s.from_date fromDate, s.to_date toDate, e.first_name firstName, e.last_name lastName FROM salaries s INNER JOIN employees e ON s.emp_no = e.emp_no WHERE first_name LIKE ? OR last_name Like ? ORDER BY fromDate ASC LIMIT ?,?";
+	   stmt = conn.prepareStatement(sql);
+	   
+	   stmt.setString(1, "%"+word+"%");
+	   stmt.setString(2, "%"+word+"%");
+	   stmt.setInt(3, beginRow);
+	   stmt.setInt(4, ROW_PER_PAGE);
+	   rs = stmt.executeQuery();
+	   
+	   sql1 = "SELECT COUNT(*) FROM salaries s INNER JOIN employees e ON s.emp_no = e.emp_no WHERE first_name LIKE ? OR last_name Like ?";
+	   stmt1 = conn.prepareStatement(sql1);
+	   stmt1.setString(1, "%"+word+"%");
+	   stmt1.setString(2, "%"+word+"%");
+	   rs1 = stmt1.executeQuery();
+   }
    
 	int count =0;
 	if(rs1.next()){
@@ -49,6 +79,14 @@
       s.emp.lastName = rs.getString("lastName");
       salaryList.add(s);
    }
+   
+	rs.close();
+	stmt.close();
+	conn.close();
+	
+	rs1.close();
+	stmt1.close();
+	
 %>
 <!DOCTYPE html>
 <html>
@@ -63,11 +101,11 @@
 		<jsp:include page="../menu.jsp"></jsp:include> 
 		<!-- include의 주소에는 context를 사용하지 않는다 편한 액션 중하나 -->
 	</div>
-	<h1 style="text-align:center" class="mt-4 p-5 bg-primary text-white rounded">급여명세서</h1>
+	<h1 style="text-align:center" class="mt-4 p-5 bg-primary text-white rounded">연봉지출내역</h1>
    <table class="table table-bordered align-middle">
    		<tr class="mt-4 p-5 bg-primary text-white rounded">
    			<th>사원번호</th>
-   			<th>급여</th>
+   			<th>연봉</th>
    			<th>입사일자</th>
    			<th>퇴사일자</th>
    			<th>사원이름</th>
@@ -89,32 +127,64 @@
    <br>
 		<div>
 			<nav aria-label="Page navigation example">
-	  			<ul class="pagination justify-content-center pagination-lg">
-	  				<%if(currentPage > 1){%>	
-		   				<li class="page-item">
-		   				<% }else{ %>
-		   				<li class="page-item disabled"><%} %>
-		      				<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage-1%>">Previous</a>
-		    			</li>
-		    		<%if(currentPage > 1){%>	
-		    			<li class="page-item">
-		    				<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage-1%>"><%=currentPage-1%></a></li>
-		    		<%} %>
-		    			<li class="page-item active" aria-current="page">
-		    				<span class="page-link"><%=currentPage%></span></li>
-		    		<%if(currentPage < lastPage){%>		
-		    			<li class="page-item">
-		    				<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage+1%>"><%=currentPage+1%></a></li>
-		    		<%}
-		    		  if(currentPage < lastPage){%>	
-		    			<li class="page-item">
-		    		<%}else{ %>
-		    			<li class="page-item disabled"><%} %>
-		      		   		<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage+1%>">Next</a>
-		    			</li>	
-	  			</ul>
-	  		</nav>
-  		</div>	
+  			<ul class="pagination justify-content-center pagination-lg">
+   			<%if(word==null){ %>
+   				
+	   			<%if(currentPage > 1){%>	
+	   				<li class="page-item">
+	   				<% }else{ %>
+	   				<li class="page-item disabled"><%} %>
+	      				<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage-1%>">Previous</a>
+	    			</li>
+	    		<%if(currentPage > 1){%>	
+	    			<li class="page-item">
+	    				<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage-1%>"><%=currentPage-1%></a></li>
+	    		<%} %>
+	    			<li class="page-item active" aria-current="page">
+	    				<span class="page-link"><%=currentPage%></span></li>
+	    		<%if(currentPage < lastPage){%>		
+	    			<li class="page-item">
+	    				<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage+1%>"><%=currentPage+1%></a></li>
+	    		<%}
+	    		  if(currentPage < lastPage){%>	
+	    			<li class="page-item">
+	    		<%}else{ %>
+	    			<li class="page-item disabled"><%} %>
+	      		   		<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage+1%>">Next</a>
+	    			</li>
+	    	<%}else{ %>
+	    		<%if(currentPage > 1){%>	
+	   				<li class="page-item">
+	   				<% }else{ %>
+	   				<li class="page-item disabled"><%} %>
+	      				<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>">Previous</a>
+	    			</li>
+	    		<%if(currentPage > 1){%>	
+	    			<li class="page-item">
+	    				<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage-1%>&word=<%=word%>"><%=currentPage-1%></a></li>
+	    		<%} %>
+	    			<li class="page-item active" aria-current="page">
+	    				<span class="page-link"><%=currentPage%></span></li>
+	    		<%if(currentPage < lastPage){%>		
+	    			<li class="page-item">
+	    				<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>"><%=currentPage+1%></a></li>
+	    		<%}
+	    		  if(currentPage < lastPage){%>	
+	    			<li class="page-item">
+	    		<%}else{ %>
+	    			<li class="page-item disabled"><%} %>
+	      		   		<a class="page-link" href="<%=request.getContextPath()%>/salary/salaryList.jsp?currentPage=<%=currentPage+1%>&word=<%=word%>">Next</a>
+	    			</li>
+	    	<%} %>
+ 	   		</ul>
+	   </nav>
+		</div>
+		<div>
+			<form method="post" action="<%=request.getContextPath()%>/salary/salaryList.jsp">
+				<span>&nbsp;&nbsp;&nbsp;</span><input type="text" name="word" <%if(word==null||word.equals("")){ %>placeholder="사원검색"<%}else{ %>value="<%=word%>"<% }%>>
+				<button type="submit" class="btn btn-outline-primary">검색</button>
+			</form>
+		</div>	
    
 </body>
 </html>
